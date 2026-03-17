@@ -1,5 +1,6 @@
 import io
 import json
+import os
 import re
 import socket
 import sqlite3
@@ -730,7 +731,8 @@ def history_item(job_id: str):
 
 def main() -> None:
     init_db()
-    app.run(host="127.0.0.1", port=5000, debug=False)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
 
 
 if __name__ == "__main__":
