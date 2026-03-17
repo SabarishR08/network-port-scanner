@@ -21,8 +21,8 @@ A lightweight but advanced TCP port scanner with a browser-based UI built using 
 ## Installation
 
 ```bash
-git clone https://github.com/SabarishR08/nmap_portscan_gui.git
-cd nmap_portscan_gui
+git clone https://github.com/SabarishR08/network-port-scanner.git
+cd network-port-scanner
 pip install -r requirements.txt
 ```
 
@@ -73,7 +73,7 @@ Ports not in the list are reported as `Unknown`.
 ## Project Structure
 
 ```
-nmap_portscan_gui/
+network-port-scanner/
 ├── portscanergui.py   # Flask app + scan engine + API
 ├── templates/
 │   └── index.html     # Main web UI
