@@ -277,6 +277,10 @@ def init_db() -> None:
             conn.commit()
 
 
+# Ensure the DB schema exists when the module is imported by gunicorn.
+init_db()
+
+
 def persist_job(snapshot: dict) -> None:
     with DB_LOCK:
         with get_db_connection() as conn:
