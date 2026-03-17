@@ -55,6 +55,20 @@
           <input id="workers" type="number" min="1" max="1000" step="1" value="400" required>
         </label>
 
+        <label class="toggleLabel">
+          <span>Banner Grab</span>
+          <input id="bannerGrab" type="checkbox">
+        </label>
+
+        <label>
+          Export Format
+          <select id="exportFormat">
+            <option value="txt" selected>TXT</option>
+            <option value="csv">CSV</option>
+            <option value="json">JSON</option>
+          </select>
+        </label>
+
         <div class="actions">
           <button id="startBtn" type="submit" class="primary">Start Scan</button>
           <button id="stopBtn" type="button" class="ghost" disabled>Stop</button>
@@ -98,10 +112,11 @@
             <tr>
               <th>Port</th>
               <th>Service</th>
+              <th>Banner / Version</th>
             </tr>
           </thead>
           <tbody id="resultsBody">
-            <tr><td colspan="2" class="empty">No scan data yet.</td></tr>
+            <tr><td colspan="3" class="empty">No scan data yet.</td></tr>
           </tbody>
         </table>
       </div>
@@ -109,6 +124,31 @@
       <div class="errorBox">
         <h3>Diagnostics</h3>
         <pre id="errors">No errors.</pre>
+      </div>
+    </section>
+
+    <section class="panel reveal delay-3">
+      <div class="historyHead">
+        <h3>Scan History (Persistent)</h3>
+        <button id="refreshHistoryBtn" type="button" class="ghost">Refresh</button>
+      </div>
+      <div class="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Target</th>
+              <th>Range</th>
+              <th>Status</th>
+              <th>Open</th>
+              <th>Elapsed</th>
+              <th>Banner</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody">
+            <tr><td colspan="7" class="empty">No persisted scans yet.</td></tr>
+          </tbody>
+        </table>
       </div>
     </section>
   </main>

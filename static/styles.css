@@ -88,6 +88,15 @@ label {
   gap: 0.35rem;
 }
 
+.toggleLabel {
+  justify-content: flex-end;
+}
+
+.toggleLabel input {
+  width: 22px;
+  height: 22px;
+}
+
 input,
 select,
 button {
@@ -224,6 +233,18 @@ thead {
 
 .errorBox {
   margin-top: 0.9rem;
+}
+
+.historyHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.7rem;
+}
+
+.historyHead h3 {
+  margin: 0;
+  font-size: 1rem;
 }
 
 .errorBox h3 {

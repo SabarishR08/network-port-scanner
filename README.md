@@ -1,17 +1,26 @@
 # Network Port Scanner Web UI
 
-A lightweight but advanced TCP port scanner with a browser-based UI built using Python and Flask.
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-Web%20API-000000?logo=flask&logoColor=white)
+![SQLite](https://img.shields.io/badge/Storage-SQLite-003B57?logo=sqlite&logoColor=white)
+![Export](https://img.shields.io/badge/Export-TXT%20%7C%20CSV%20%7C%20JSON-0A7E8C)
+![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-4C8EDA)
+![License](https://img.shields.io/badge/License-MIT-green)
+
+TCP port scanner with a browser UI built using Python and Flask.
 
 ## Features
 
-- **Modern HTML dashboard** - responsive web interface with live status cards and progress tracking
-- **Advanced scan controls** - target, port range, timeout, worker count, and quick scan profiles
-- **Multi-threaded scanning** - up to 1000 concurrent workers for faster sweeps
-- **Service identification** - labels common services (SSH, HTTP, SMB, RDP, MySQL, PostgreSQL, Redis, and more)
-- **Live results stream** - open ports and diagnostics update in near real time
-- **Stop on demand** - cancel scans gracefully
-- **Export reports** - download a text report for each scan job
-- **Cross-platform** - runs on Windows, macOS, and Linux
+- Web interface for running scans from browser
+- Scan settings: target, port range, timeout, worker count, and preset ranges
+- Multi-threaded scanning (up to 1000 workers)
+- Optional banner grabbing for open ports
+- Port-to-service labels for common ports
+- Live progress and diagnostics while scan is running
+- Stop running scan
+- Scan history saved in SQLite (`scan_history.db`)
+- Export scan results as `TXT`, `CSV`, or `JSON`
+- Works on Windows, macOS, and Linux
 
 ## Requirements
 
@@ -41,7 +50,34 @@ Then open:
 3. Tune **Timeout** and **Threads** if needed.
 4. Click **Start Scan**.
 5. Watch live progress and open ports.
-6. Click **Stop** to interrupt, or **Export** to download results.
+6. Optional: enable **Banner Grab** to collect service banners/version hints.
+7. Choose **Export Format** (`TXT`, `CSV`, `JSON`) and click **Export**.
+8. Use **Scan History** to reload previous persisted scans after restart.
+
+## API Endpoints
+
+- `POST /api/scan/start` - start new scan
+- `POST /api/scan/<job_id>/stop` - stop running scan
+- `GET /api/scan/<job_id>/status` - current scan status
+- `GET /api/scan/<job_id>/export?format=txt|csv|json` - export results
+- `GET /api/history?limit=20` - list saved scan history
+- `GET /api/history/<job_id>` - load one saved history item
+
+## Scan Your Own IP (Windows)
+
+1. Open Command Prompt and run:
+
+```bash
+ipconfig
+```
+
+2. From the active adapter (usually `Wi-Fi` or `Ethernet`), copy the `IPv4 Address`.
+3. Use that IP as the **Target Host** in the scanner.
+
+Notes:
+
+- `127.0.0.1` scans localhost only.
+- Your LAN IP (example: `10.x.x.x` or `192.168.x.x`) scans your machine on the network interface.
 
 ## Detected Services
 
@@ -81,8 +117,16 @@ network-port-scanner/
 │   ├── styles.css     # UI styles
 │   └── app.js         # Frontend logic (API polling, rendering)
 ├── requirements.txt
+├── scan_history.db    # Created at runtime (SQLite history)
 └── README.md
 ```
+
+## Security Notes
+
+- The app limits concurrent active scan jobs to `3` to reduce abuse and accidental overload.
+- Request payload size is capped server-side to prevent oversized request abuse.
+- Export filenames are sanitized before download.
+- Recommended for local/trusted environments; avoid exposing this scanner directly to the public internet.
 
 ## Disclaimer
 
