@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PowerScan Web Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <div class="backdrop"></div>
+  <main class="container">
+    <header class="hero reveal">
+      <p class="eyebrow">Advanced Network Recon</p>
+      <h1>PowerScan Web Console</h1>
+      <p class="sub">Upgrade from basic desktop scanning to a live browser dashboard with stronger controls and export-ready reports.</p>
+    </header>
+
+    <section class="panel reveal delay-1">
+      <form id="scanForm" class="grid">
+        <label>
+          Target Host
+          <input id="target" name="target" placeholder="scanme.nmap.org or 192.168.1.1" required>
+        </label>
+
+        <label>
+          Scan Profile
+          <select id="profile">
+            <option value="quick">Quick (1-1024)</option>
+            <option value="extended">Extended (1-5000)</option>
+            <option value="full">Full TCP (1-65535)</option>
+            <option value="custom" selected>Custom Range</option>
+          </select>
+        </label>
+
+        <label>
+          Start Port
+          <input id="startPort" type="number" min="0" max="65535" value="1" required>
+        </label>
+
+        <label>
+          End Port
+          <input id="endPort" type="number" min="0" max="65535" value="1024" required>
+        </label>
+
+        <label>
+          Timeout (sec)
+          <input id="timeout" type="number" min="0.01" max="10" step="0.01" value="0.5" required>
+        </label>
+
+        <label>
+          Threads
+          <input id="workers" type="number" min="1" max="1000" step="1" value="400" required>
+        </label>
+
+        <div class="actions">
+          <button id="startBtn" type="submit" class="primary">Start Scan</button>
+          <button id="stopBtn" type="button" class="ghost" disabled>Stop</button>
+          <button id="exportBtn" type="button" class="ghost" disabled>Export</button>
+          <button id="clearBtn" type="button" class="ghost">Clear</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="metrics reveal delay-2">
+      <article>
+        <span>Status</span>
+        <strong id="statusText">Idle</strong>
+      </article>
+      <article>
+        <span>Target IP</span>
+        <strong id="resolvedIp">-</strong>
+      </article>
+      <article>
+        <span>Elapsed</span>
+        <strong id="elapsed">0.00s</strong>
+      </article>
+      <article>
+        <span>Open Ports</span>
+        <strong id="openCount">0</strong>
+      </article>
+    </section>
+
+    <section class="panel reveal delay-3">
+      <div class="progressWrap">
+        <div class="progressLabel">
+          <span id="progressText">0 / 0 scanned</span>
+          <span id="progressPercent">0%</span>
+        </div>
+        <div class="progressBar"><div id="progressFill"></div></div>
+      </div>
+
+      <div class="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Port</th>
+              <th>Service</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody">
+            <tr><td colspan="2" class="empty">No scan data yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="errorBox">
+        <h3>Diagnostics</h3>
+        <pre id="errors">No errors.</pre>
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
