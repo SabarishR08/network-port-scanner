@@ -28,10 +28,19 @@
         <label>
           Scan Profile
           <select id="profile">
-            <option value="quick">Quick (1-1024)</option>
-            <option value="extended">Extended (1-5000)</option>
-            <option value="full">Full TCP (1-65535)</option>
+            <option value="quick_scan">Quick (Top 100)</option>
+            <option value="web_scan">Web (80,443,8080)</option>
+            <option value="stealth_scan">Stealth (low threads)</option>
+            <option value="full_scan">Full TCP (1-65535)</option>
             <option value="custom" selected>Custom Range</option>
+          </select>
+        </label>
+
+        <label>
+          Mode
+          <select id="mode">
+            <option value="SAFE_MODE" selected>SAFE_MODE</option>
+            <option value="ADVANCED_MODE">ADVANCED_MODE</option>
           </select>
         </label>
 
@@ -64,7 +73,6 @@
           Export Format
           <select id="exportFormat">
             <option value="txt" selected>TXT</option>
-            <option value="csv">CSV</option>
             <option value="json">JSON</option>
           </select>
         </label>
@@ -113,12 +121,25 @@
               <th>Port</th>
               <th>Service</th>
               <th>Banner / Version</th>
+              <th>Risk</th>
+              <th>Reason</th>
+              <th>AI Source</th>
             </tr>
           </thead>
           <tbody id="resultsBody">
-            <tr><td colspan="3" class="empty">No scan data yet.</td></tr>
+            <tr><td colspan="6" class="empty">No scan data yet.</td></tr>
           </tbody>
         </table>
+      </div>
+
+      <div class="errorBox">
+        <h3>Comparison</h3>
+        <pre id="comparison">New ports detected: 0</pre>
+      </div>
+
+      <div class="errorBox">
+        <h3>Recommendations</h3>
+        <pre id="recommendations">No recommendations yet.</pre>
       </div>
 
       <div class="errorBox">

@@ -7,6 +7,7 @@ const timeout = document.getElementById("timeout");
 const workers = document.getElementById("workers");
 const bannerGrab = document.getElementById("bannerGrab");
 const exportFormat = document.getElementById("exportFormat");
+const mode = document.getElementById("mode");
 
 const startBtn = document.getElementById("startBtn");
 const stopBtn = document.getElementById("stopBtn");
@@ -25,14 +26,17 @@ const progressFill = document.getElementById("progressFill");
 const resultsBody = document.getElementById("resultsBody");
 const errorsEl = document.getElementById("errors");
 const historyBody = document.getElementById("historyBody");
+const comparisonEl = document.getElementById("comparison");
+const recommendationsEl = document.getElementById("recommendations");
 
 let currentJobId = null;
 let pollTimer = null;
 
 const profiles = {
-  quick: [1, 1024],
-  extended: [1, 5000],
-  full: [1, 65535]
+  quick_scan: [1, 1024],
+  web_scan: [80, 8080],
+  stealth_scan: [1, 1024],
+  full_scan: [1, 65535]
 };
 
 profile.addEventListener("change", () => {
@@ -49,12 +53,20 @@ form.addEventListener("submit", async (event) => {
 
   const payload = {
     target: target.value.trim(),
-    start_port: Number(startPort.value),
-    end_port: Number(endPort.value),
-    timeout: Number(timeout.value),
-    max_workers: Number(workers.value),
+    mode: mode.value || "SAFE_MODE",
     banner_grab: bannerGrab.checked
   };
+
+  if (profile.value === "custom") {
+    payload.start_port = Number(startPort.value);
+    payload.end_port = Number(endPort.value);
+    payload.timeout = Number(timeout.value);
+    payload.max_workers = Number(workers.value);
+  } else {
+    payload.profile = profile.value;
+    payload.timeout = Number(timeout.value);
+    payload.max_workers = Number(workers.value);
+  }
 
   if (!payload.target) {
     setStatus("Target required");
@@ -124,7 +136,9 @@ clearBtn.addEventListener("click", () => {
   progressPercent.textContent = "0%";
   progressFill.style.width = "0%";
   errorsEl.textContent = "No errors.";
-  resultsBody.innerHTML = '<tr><td colspan="3" class="empty">No scan data yet.</td></tr>';
+  comparisonEl.textContent = "New ports detected: 0";
+  recommendationsEl.textContent = "No recommendations yet.";
+  resultsBody.innerHTML = '<tr><td colspan="6" class="empty">No scan data yet.</td></tr>';
   startBtn.disabled = false;
   stopBtn.disabled = true;
   exportBtn.disabled = true;
@@ -210,12 +224,31 @@ function renderJob(job) {
     const rows = job.open_ports
       .map((row) => {
         const banner = row.banner ? escapeHtml(row.banner) : "-";
-        return `<tr><td>${row.port}</td><td>${escapeHtml(row.service)}</td><td>${banner}</td></tr>`;
+        const risk = row.risk ? escapeHtml(row.risk) : "Unknown";
+        const reason = row.reason ? escapeHtml(row.reason) : "Unable to analyze";
+        const source = (row.ai_source || "fallback").toLowerCase();
+        const safeSource = escapeHtml(source);
+        const sourceClass = source === "gemini" ? "src-gemini" : (source === "groq" ? "src-groq" : "src-fallback");
+        return `<tr><td>${row.port}</td><td>${escapeHtml(row.service)}</td><td>${banner}</td><td>${risk}</td><td>${reason}</td><td><span class="sourceBadge ${sourceClass}">${safeSource}</span></td></tr>`;
       })
       .join("");
     resultsBody.innerHTML = rows;
   } else {
-    resultsBody.innerHTML = '<tr><td colspan="3" class="empty">No open ports found yet.</td></tr>';
+    resultsBody.innerHTML = '<tr><td colspan="6" class="empty">No open ports found yet.</td></tr>';
+  }
+
+  if (job.comparison && job.comparison.message) {
+    const newPorts = (job.comparison.new_ports || []).join(", ") || "None";
+    const closedPorts = (job.comparison.closed_ports || []).join(", ") || "None";
+    comparisonEl.textContent = `${job.comparison.message}\nNew: ${newPorts}\nClosed: ${closedPorts}`;
+  } else {
+    comparisonEl.textContent = "New ports detected: 0";
+  }
+
+  if (job.recommendations && job.recommendations.length > 0) {
+    recommendationsEl.textContent = job.recommendations.join("\n");
+  } else {
+    recommendationsEl.textContent = "No recommendations yet.";
   }
 
   if (job.errors && job.errors.length > 0) {

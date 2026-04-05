@@ -266,6 +266,31 @@ thead {
   font-size: 0.78rem;
 }
 
+.sourceBadge {
+  display: inline-block;
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.src-gemini {
+  background: #e8f6ff;
+  color: #005b7f;
+}
+
+.src-groq {
+  background: #f1ffe8;
+  color: #2a6b00;
+}
+
+.src-fallback {
+  background: #fff3e3;
+  color: #8f4f00;
+}
+
 .reveal {
   opacity: 0;
   transform: translateY(14px);
