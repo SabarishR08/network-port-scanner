@@ -9,6 +9,8 @@ import uuid
 from dataclasses import dataclass, field
 
 from flask import Flask, jsonify, render_template, request, send_file
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 
 from analyzer import analyze_ports_risk_with_source
 from config import SETTINGS
@@ -602,8 +604,8 @@ def export_scan(job_id: str):
         return jsonify({"ok": False, "error": "Scan job not found"}), 404
 
     export_format = request.args.get("format", "txt").strip().lower()
-    if export_format not in {"txt", "json"}:
-        return jsonify({"ok": False, "error": "Supported formats: txt, json"}), 400
+    if export_format not in {"txt", "json", "pdf"}:
+        return jsonify({"ok": False, "error": "Supported formats: txt, json, pdf"}), 400
 
     if export_format == "json":
         payload = {
@@ -622,7 +624,7 @@ def export_scan(job_id: str):
         file_obj = io.BytesIO(json.dumps(payload, indent=2).encode("utf-8"))
         mime = "application/json"
         ext = "json"
-    else:
+    elif export_format == "txt":
         lines = [
             "PowerScan Recon Report",
             f"Target: {snapshot['target']} ({snapshot['resolved_ip']})",
@@ -654,6 +656,62 @@ def export_scan(job_id: str):
         file_obj = io.BytesIO("\n".join(lines).encode("utf-8"))
         mime = "text/plain"
         ext = "txt"
+    else:
+        buffer = io.BytesIO()
+        pdf = canvas.Canvas(buffer, pagesize=letter)
+        width, height = letter
+        x = 48
+        y = height - 48
+        line_height = 14
+
+        def write_line(text: str, bold: bool = False) -> None:
+            nonlocal y
+            if y < 60:
+                pdf.showPage()
+                y = height - 48
+            pdf.setFont("Helvetica-Bold" if bold else "Helvetica", 10)
+            pdf.drawString(x, y, text[:150])
+            y -= line_height
+
+        write_line("PowerScan Recon Report", bold=True)
+        write_line(f"Target: {snapshot['target']} ({snapshot['resolved_ip']})")
+        write_line(f"Target Type: {snapshot['target_type']}")
+        write_line(f"Status: {snapshot['status']}")
+        write_line(f"Mode: {snapshot['mode']}")
+        write_line(f"Warning: {snapshot.get('warning') or 'None'}")
+        write_line(f"Elapsed: {snapshot['elapsed_seconds']} seconds")
+        write_line(f"Open Ports: {snapshot['open_count']}")
+        write_line(snapshot.get("comparison", {}).get("message", "New ports detected: 0"))
+        y -= 6
+
+        write_line("Open Port Analysis:", bold=True)
+        if snapshot["open_ports"]:
+            for row in snapshot["open_ports"]:
+                write_line(
+                    f"{row['port']} | {row['service']} | Risk: {row.get('risk', 'Unknown')} | "
+                    f"Source: {row.get('ai_source', 'fallback')}"
+                )
+                write_line(f"Reason: {row.get('reason', 'Unable to analyze')}")
+                banner = row.get("banner", "") or "-"
+                write_line(f"Banner: {banner}")
+                y -= 4
+        else:
+            write_line("No open ports detected")
+
+        y -= 6
+        write_line("Recommendations:", bold=True)
+        recs = snapshot.get("recommendations", [])
+        if recs:
+            for rec in recs:
+                write_line(f"- {rec}")
+        else:
+            write_line("- No recommendations")
+
+        pdf.save()
+        buffer.seek(0)
+        file_obj = buffer
+        mime = "application/pdf"
+        ext = "pdf"
 
     safe_target = sanitize_filename(snapshot["target"])
     name = f"powerscan_{safe_target}_{int(time.time())}.{ext}"

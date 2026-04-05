@@ -6,7 +6,7 @@ PowerScan is an AI-assisted network reconnaissance tool that combines port scann
 ![Flask](https://img.shields.io/badge/Flask-Web%20API-000000?logo=flask&logoColor=white)
 ![SQLite](https://img.shields.io/badge/Storage-SQLite-003B57?logo=sqlite&logoColor=white)
 ![AI](https://img.shields.io/badge/AI-Gemini%20%2B%20Groq-1f6feb)
-![Export](https://img.shields.io/badge/Export-TXT%20%7C%20JSON-0A7E8C)
+![Export](https://img.shields.io/badge/Export-TXT%20%7C%20JSON%20%7C%20PDF-0A7E8C)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-4C8EDA)
 ![License](https://img.shields.io/badge/License-MIT-green)
 [![Demo Video](https://img.shields.io/badge/Demo-Video-red?logo=google-drive&logoColor=white)](https://drive.google.com/file/d/1ma06I1Avt3lqvKm910m9ZBkdw4irzpkU/view?usp=sharing)
@@ -77,6 +77,7 @@ If Gemini is unavailable or rate-limited, PowerScan automatically falls back to 
 - Report export:
 	- `TXT`
 	- `JSON`
+	- `PDF`
 - Frontend dashboard:
 	- Progress + status polling
 	- Risk and reason columns
@@ -129,7 +130,7 @@ Open:
 - `POST /api/scan/start` - start a new scan
 - `POST /api/scan/<job_id>/stop` - stop/close active job (compat endpoint)
 - `GET /api/scan/<job_id>/status` - job status and results
-- `GET /api/scan/<job_id>/export?format=txt|json` - export report
+- `GET /api/scan/<job_id>/export?format=txt|json|pdf` - export report
 - `GET /api/history?limit=20` - list history
 - `GET /api/history/<job_id>` - load one history item
 
