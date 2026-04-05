@@ -22,7 +22,7 @@ Most port scanners return raw network data. PowerScan focuses on interpreting th
 ## Demo
 
 View the demo video:
-https://drive.google.com/file/d/1ma06I1Avt3lqvKm910m9ZBkdw4irzpkU/view?usp=sharing
+https://drive.google.com/file/d/1rBTgc8jhbZKLUPBssW9r1uj6MsoodW-y/view?usp=drive_link
 
 ## AI Source Badge Demo
 
