@@ -1,5 +1,7 @@
 # PowerScan: Advanced Web-Based Network Recon Platform
 
+PowerScan is an AI-assisted network reconnaissance tool that combines port scanning with concise risk analysis and controlled scanning modes.
+
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-Web%20API-000000?logo=flask&logoColor=white)
 ![SQLite](https://img.shields.io/badge/Storage-SQLite-003B57?logo=sqlite&logoColor=white)
@@ -9,13 +11,18 @@
 ![License](https://img.shields.io/badge/License-MIT-green)
 [![Demo Video](https://img.shields.io/badge/Demo-Video-red?logo=google-drive&logoColor=white)](https://drive.google.com/file/d/1ma06I1Avt3lqvKm910m9ZBkdw4irzpkU/view?usp=sharing)
 
-PowerScan is a modular, AI-enhanced network reconnaissance backend and web console built with Python + Flask.
+PowerScan is a modular network reconnaissance tool built with Python and Flask.
 
-It upgrades a traditional TCP port scanner into a safer recon workflow with service fingerprinting, concise risk insights, scan history comparison, and export-ready reports.
+It extends a traditional TCP port scanner with service detection, AI-based risk classification, scan history comparison, and exportable reports.
+
+## Why PowerScan
+
+Most port scanners return raw network data. PowerScan focuses on interpreting that data by attaching short, consistent risk explanations and enforcing safer scanning defaults.
 
 ## Demo
 
-- Demo video: [PowerScan Demo](https://drive.google.com/file/d/1ma06I1Avt3lqvKm910m9ZBkdw4irzpkU/view?usp=sharing)
+View the demo video:
+https://drive.google.com/file/d/1ma06I1Avt3lqvKm910m9ZBkdw4irzpkU/view?usp=sharing
 
 ## AI Source Badge Demo
 
@@ -27,7 +34,7 @@ PowerScan now shows which provider produced each risk result in the UI:
 
 If Gemini is unavailable or rate-limited, PowerScan automatically falls back to Groq. If both fail, the result is marked as `Fallback` and still returns a deterministic risk line.
 
-## Full Feature Set
+## Features
 
 - Modular backend architecture:
 	- `config.py` for environment and runtime settings
@@ -46,14 +53,14 @@ If Gemini is unavailable or rate-limited, PowerScan automatically falls back to 
 - AI provider fallback chain:
 	- Gemini first
 	- Groq fallback
-	- Safe deterministic fallback if both fail
+	- Deterministic fallback if both providers fail
 - AI source attribution per port (`gemini`, `groq`, `fallback`) shown in UI
 - Scan profiles:
 	- `quick_scan` (top 100 ports)
 	- `full_scan` (1-65535)
 	- `stealth_scan` (lower threads, higher timeout)
 	- `web_scan` (80, 443, 8080)
-	- `custom` range (manual)
+	- `custom` range
 - SAFE_MODE / ADVANCED_MODE target controls:
 	- SAFE_MODE allows only `127.0.0.1`, `scanme.nmap.org`, and private ranges
 	- ADVANCED_MODE allows all targets
@@ -70,7 +77,7 @@ If Gemini is unavailable or rate-limited, PowerScan automatically falls back to 
 - Report export:
 	- `TXT`
 	- `JSON`
-- Frontend dashboard updates:
+- Frontend dashboard:
 	- Progress + status polling
 	- Risk and reason columns
 	- AI source badge column
@@ -162,11 +169,10 @@ network-port-scanner/
 
 ## Security Notes
 
-- Scan only systems you own or have explicit permission to test.
-- Keep API keys in `.env` only; never hardcode secrets.
-- `.env` is git-ignored to reduce accidental key leaks.
-- Public target scans surface a warning in API/UI.
-- SAFE_MODE is recommended for lab usage.
+- Scan only systems you own or have permission to test.
+- Store API keys in `.env`; do not commit them.
+- Public targets trigger a warning in the UI/API.
+- SAFE_MODE is recommended for controlled environments.
 
 ## Disclaimer
 
