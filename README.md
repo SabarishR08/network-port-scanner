@@ -1,31 +1,85 @@
-# Network Port Scanner Web UI
+# PowerScan: Advanced Web-Based Network Recon Platform
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-Web%20API-000000?logo=flask&logoColor=white)
 ![SQLite](https://img.shields.io/badge/Storage-SQLite-003B57?logo=sqlite&logoColor=white)
-![Export](https://img.shields.io/badge/Export-TXT%20%7C%20CSV%20%7C%20JSON-0A7E8C)
+![AI](https://img.shields.io/badge/AI-Gemini%20%2B%20Groq-1f6feb)
+![Export](https://img.shields.io/badge/Export-TXT%20%7C%20JSON-0A7E8C)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-4C8EDA)
 ![License](https://img.shields.io/badge/License-MIT-green)
+[![Demo Video](https://img.shields.io/badge/Demo-Video-red?logo=google-drive&logoColor=white)](https://drive.google.com/file/d/1ma06I1Avt3lqvKm910m9ZBkdw4irzpkU/view?usp=sharing)
 
-TCP port scanner with a browser UI built using Python and Flask.
+PowerScan is a modular, AI-enhanced network reconnaissance backend and web console built with Python + Flask.
 
-## Features
+It upgrades a traditional TCP port scanner into a safer recon workflow with service fingerprinting, concise risk insights, scan history comparison, and export-ready reports.
 
-- Web interface for running scans from browser
-- Scan settings: target, port range, timeout, worker count, and preset ranges
-- Multi-threaded scanning (up to 1000 workers)
-- Optional banner grabbing for open ports
-- Port-to-service labels for common ports
-- Live progress and diagnostics while scan is running
-- Stop running scan
-- Scan history saved in SQLite (`scan_history.db`)
-- Export scan results as `TXT`, `CSV`, or `JSON`
-- Works on Windows, macOS, and Linux
+## Demo
+
+- Demo video: [PowerScan Demo](https://drive.google.com/file/d/1ma06I1Avt3lqvKm910m9ZBkdw4irzpkU/view?usp=sharing)
+
+## AI Source Badge Demo
+
+PowerScan now shows which provider produced each risk result in the UI:
+
+![Gemini](https://img.shields.io/badge/AI_Source-Gemini-00A3FF)
+![Groq](https://img.shields.io/badge/AI_Source-Groq-54b948)
+![Fallback](https://img.shields.io/badge/AI_Source-Fallback-orange)
+
+If Gemini is unavailable or rate-limited, PowerScan automatically falls back to Groq. If both fail, the result is marked as `Fallback` and still returns a deterministic risk line.
+
+## Full Feature Set
+
+- Modular backend architecture:
+	- `config.py` for environment and runtime settings
+	- `scanner.py` for scanning/profiles/banner logic
+	- `analyzer.py` for Gemini + Groq AI analysis
+	- `utils.py` for helper logic (classification, recommendations, parsing)
+	- `main.py` for API endpoints + orchestration
+- Multi-threaded TCP scanning with configurable timeout and workers
+- Smart service detection and banner probing:
+	- HTTP request probe (`GET / HTTP/1.1`)
+	- SSH handshake/banner detection
+	- Service/version normalization
+- AI risk analyzer with strict one-line output parsing:
+	- `Risk: <Low/Medium/High> | Reason: <...>`
+- Batched AI analysis (single request for all open ports) for lower latency/cost
+- AI provider fallback chain:
+	- Gemini first
+	- Groq fallback
+	- Safe deterministic fallback if both fail
+- AI source attribution per port (`gemini`, `groq`, `fallback`) shown in UI
+- Scan profiles:
+	- `quick_scan` (top 100 ports)
+	- `full_scan` (1-65535)
+	- `stealth_scan` (lower threads, higher timeout)
+	- `web_scan` (80, 443, 8080)
+	- `custom` range (manual)
+- SAFE_MODE / ADVANCED_MODE target controls:
+	- SAFE_MODE allows only `127.0.0.1`, `scanme.nmap.org`, and private ranges
+	- ADVANCED_MODE allows all targets
+- Target classification:
+	- `localhost`, `private`, `public`
+	- Warning flag for public scans
+- Result enrichment per open port:
+	- `port`, `service`, `banner`, `risk`, `reason`, `ai_source`
+- Recommendation engine based on exposed services
+- Persistent scan history in SQLite
+- History comparison:
+	- new ports detected
+	- ports closed
+- Report export:
+	- `TXT`
+	- `JSON`
+- Frontend dashboard updates:
+	- Progress + status polling
+	- Risk and reason columns
+	- AI source badge column
+	- Comparison and recommendations panels
 
 ## Requirements
 
-- Python 3.10 or newer
-- Flask
+- Python 3.10+
+- pip
 
 ## Installation
 
@@ -35,102 +89,88 @@ cd network-port-scanner
 pip install -r requirements.txt
 ```
 
-## Usage
+## Environment Setup
+
+Create a `.env` file at project root:
+
+```env
+GEMINI_API_KEY=your_gemini_key
+GROQ_API_KEY=your_groq_key
+GEMINI_MODEL=gemini-2.0-flash
+GROQ_MODEL=llama-3.1-8b-instant
+
+# Optional runtime settings
+HOST=0.0.0.0
+PORT=5000
+SCAN_MODE=SAFE_MODE
+MAX_ACTIVE_JOBS=3
+MAX_STORED_JOBS=50
+```
+
+## Run
 
 ```bash
 python portscanergui.py
 ```
 
-Then open:
+Open:
 
-`http://127.0.0.1:5000`
-
-1. Enter the **Target** host or IP.
-2. Choose a **Scan Profile** or set a custom port range.
-3. Tune **Timeout** and **Threads** if needed.
-4. Click **Start Scan**.
-5. Watch live progress and open ports.
-6. Optional: enable **Banner Grab** to collect service banners/version hints.
-7. Choose **Export Format** (`TXT`, `CSV`, `JSON`) and click **Export**.
-8. Use **Scan History** to reload previous persisted scans after restart.
+- `http://127.0.0.1:5000`
 
 ## API Endpoints
 
-- `POST /api/scan/start` - start new scan
-- `POST /api/scan/<job_id>/stop` - stop running scan
-- `GET /api/scan/<job_id>/status` - current scan status
-- `GET /api/scan/<job_id>/export?format=txt|csv|json` - export results
-- `GET /api/history?limit=20` - list saved scan history
-- `GET /api/history/<job_id>` - load one saved history item
+- `POST /api/scan/start` - start a new scan
+- `POST /api/scan/<job_id>/stop` - stop/close active job (compat endpoint)
+- `GET /api/scan/<job_id>/status` - job status and results
+- `GET /api/scan/<job_id>/export?format=txt|json` - export report
+- `GET /api/history?limit=20` - list history
+- `GET /api/history/<job_id>` - load one history item
 
-## Scan Your Own IP (Windows)
+## Sample Scan Start Payload
 
-1. Open Command Prompt and run:
-
-```bash
-ipconfig
+```json
+{
+	"target": "scanme.nmap.org",
+	"profile": "web_scan",
+	"mode": "SAFE_MODE",
+	"banner_grab": true,
+	"timeout": 0.6,
+	"max_workers": 120
+}
 ```
-
-2. From the active adapter (usually `Wi-Fi` or `Ethernet`), copy the `IPv4 Address`.
-3. Use that IP as the **Target Host** in the scanner.
-
-Notes:
-
-- `127.0.0.1` scans localhost only.
-- Your LAN IP (example: `10.x.x.x` or `192.168.x.x`) scans your machine on the network interface.
-
-## Detected Services
-
-The scanner auto-labels many common ports (sample below):
-
-| Port | Service   |
-|------|-----------|
-| 20   | FTP-Data  |
-| 21   | FTP       |
-| 22   | SSH       |
-| 23   | Telnet    |
-| 25   | SMTP      |
-| 53   | DNS       |
-| 80   | HTTP      |
-| 110  | POP3      |
-| 143  | IMAP      |
-| 445  | SMB       |
-| 443  | HTTPS     |
-| 3306 | MySQL     |
-| 3389 | RDP       |
-| 5432 | PostgreSQL|
-| 6379 | Redis     |
-| 5900 | VNC       |
-| 8080 | HTTP-Alt  |
-| 8443 | HTTPS-Alt |
-
-Ports not in the list are reported as `Unknown`.
 
 ## Project Structure
 
-```
+```text
 network-port-scanner/
-├── portscanergui.py   # Flask app + scan engine + API
+├── portscanergui.py
+├── main.py
+├── scanner.py
+├── analyzer.py
+├── utils.py
+├── config.py
 ├── templates/
-│   └── index.html     # Main web UI
+│   └── index.html
 ├── static/
-│   ├── styles.css     # UI styles
-│   └── app.js         # Frontend logic (API polling, rendering)
+│   ├── app.js
+│   └── styles.css
 ├── requirements.txt
-├── scan_history.db    # Created at runtime (SQLite history)
+├── .env                  # local only (ignored)
+├── scan_history.db       # runtime DB
 └── README.md
 ```
 
 ## Security Notes
 
-- The app limits concurrent active scan jobs to `3` to reduce abuse and accidental overload.
-- Request payload size is capped server-side to prevent oversized request abuse.
-- Export filenames are sanitized before download.
-- Recommended for local/trusted environments; avoid exposing this scanner directly to the public internet.
+- Scan only systems you own or have explicit permission to test.
+- Keep API keys in `.env` only; never hardcode secrets.
+- `.env` is git-ignored to reduce accidental key leaks.
+- Public target scans surface a warning in API/UI.
+- SAFE_MODE is recommended for lab usage.
 
 ## Disclaimer
 
-Use this tool only on hosts and networks you own or have explicit permission to scan. Unauthorized port scanning may be illegal in your jurisdiction.
+Unauthorized scanning may be illegal in your jurisdiction. Use responsibly and only with permission.
 
 ## License
 
