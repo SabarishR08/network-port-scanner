@@ -1,4 +1,58 @@
-# PowerScan: Advanced Web-Based Network Recon Platform
+# Network Port Scanner
+
+![License](https://img.shields.io/badge/license-MIT-green) ![Language](https://img.shields.io/badge/language-Python-informational)
+
+
+## 📌 Overview
+
+Modular Python-based network scanner with AI risk analysis, service detection, and secure scanning controls.
+
+## 🏗️ Architecture
+
+```text
+Browser / UI
+     │   HTTP
+     ▼
+Flask app
+     │
+     └──▶ External services — Google Gemini
+```
+
+## 🧰 Tech Stack
+
+- **Language:** Python
+- **Backend:** Flask
+- **Integrations:** Google Gemini
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Python 3.10+
+
+### 1. Clone
+
+```bash
+git clone https://github.com/SabarishR08/network-port-scanner.git
+cd network-port-scanner
+```
+
+### 2. Install dependencies
+
+```bash
+python -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### 4. Run
+
+```bash
+python main.py
+```
+
+
+---
 
 PowerScan is an AI-assisted network reconnaissance tool that combines port scanning with concise risk analysis and controlled scanning modes.
 
@@ -179,6 +233,8 @@ network-port-scanner/
 
 Unauthorized scanning may be illegal in your jurisdiction. Use responsibly and only with permission.
 
-## License
+---
 
-This project is released under the [MIT License](https://opensource.org/licenses/MIT).
+## 📄 License
+
+[MIT](LICENSE) — © 2026 Sabarish R.
